@@ -14,28 +14,28 @@ export class PersonajeServiceService {
   constructor( private http: HttpClient ) { }
 
 
-  obtenerUnPersonajeRandom(): Observable<Personaje> {
-    return this.http.get<Personaje>(`${this.apiUrl}`);
+  obtenerUnPersonajeRandom(): Observable<RespuestaGenericaDto<Personaje>> {
+    return this.http.get<RespuestaGenericaDto<Personaje>>(`${this.apiUrl}`);
   }
 
-  darLike( body:Personaje ): Observable<any>{
-    return this.http.post<any>(`${this.apiUrl}/like`, body);
+  darLike( body:Personaje ): Observable<RespuestaGenericaDto<string>>{
+    return this.http.post<RespuestaGenericaDto<string>>(`${this.apiUrl}/like`, body);
   }
 
-  darDisLike( body:Personaje ): Observable<any>{
-    return this.http.post<Personaje>(`${this.apiUrl}/dislike`, body);
+  darDisLike( body:Personaje ): Observable<RespuestaGenericaDto<string>>{
+    return this.http.post<RespuestaGenericaDto<string>>(`${this.apiUrl}/dislike`, body);
   }
 
-  obtenerPersonajeConMasLikes(): Observable<Personaje> {
-    return this.http.get<Personaje>(`${this.apiUrl}/con-mas-likes`);
+  obtenerPersonajeConMasLikes(): Observable<RespuestaGenericaDto<Personaje>> {
+    return this.http.get<RespuestaGenericaDto<Personaje>>(`${this.apiUrl}/con-mas-likes`);
   }
 
-  obtenerPersonajeConMasDisLikes(): Observable<Personaje> {
-    return this.http.get<Personaje>(`${this.apiUrl}/con-mas-dislikes`);
+  obtenerPersonajeConMasDisLikes(): Observable<RespuestaGenericaDto<Personaje>> {
+    return this.http.get<RespuestaGenericaDto<Personaje>>(`${this.apiUrl}/con-mas-dislikes`);
   }
 
-  obtenerEstadoDelPikachu(): Observable<Personaje> {
-    return this.http.get<Personaje>(`${this.apiUrl}/personaje/pikachu/status`);
+  obtenerEstadoDelPikachu(): Observable<RespuestaGenericaDto<Personaje>> {
+    return this.http.get<RespuestaGenericaDto<Personaje>>(`${this.apiUrl}/personaje/pikachu/status`);
   }
 
 }

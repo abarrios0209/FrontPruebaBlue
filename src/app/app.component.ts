@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { Personaje } from './models/Personaje';
 import { PersonajeServiceService } from './services/personaje-service.service';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { RespuestaGenericaDto } from './models/RespuestaGenericaDto';
+import { ConstantesApp } from './constantes/constantes';
 
 @Component({
   selector: 'app-root',
@@ -18,20 +20,19 @@ import { MatSnackBar } from '@angular/material/snack-bar';
         animate('500ms', style({ opacity: 0 }))
       ])
     ])
-  ]
+  ],
+  encapsulation: ViewEncapsulation.None
 })
 export class AppComponent {
 
   personaje: Personaje | null | undefined;
-  personajeMasLikes: Personaje | null | undefined;
-  personajeMasDislikes: Personaje | null | undefined;
-  estadoPikachu: Personaje | null | undefined;
   opcionSeleccionada: string = '';
+  cargando: boolean = false;
 
   opciones = [
-    { value: 'likes', label: 'Personaje con más Likes' },
-    { value: 'dislikes', label: 'Personaje con más Dislikes' },
-    { value: 'pikachu', label: 'Estado de Pikachu' }
+    { value: ConstantesApp.selectLikes, label: ConstantesApp.personajeConMasLikes },
+    { value: ConstantesApp.selectDisLikes, label: ConstantesApp.personajeConMasDisLikes },
+    { value: ConstantesApp.selectPikachu, label: ConstantesApp.estadoPikachu }
   ];
 
   constructor(
@@ -44,35 +45,72 @@ export class AppComponent {
   }
 
   cargarPersonajeAleatorio() {
-    this.personajeService.obtenerUnPersonajeRandom().subscribe((personaje: any) => {
-      this.personaje = personaje.data
+    this.cargando = true;
+    this.personajeService.obtenerUnPersonajeRandom().subscribe({
+      next: (personaje: RespuestaGenericaDto<Personaje>) => {
+        this.personaje = personaje.data
+        this.cargando = false;
+      },
+      error: (error) => {
+        this.cargando = false;
+        this.pintarSnackBar(ConstantesApp.errorPersonajeAleatorio);
+        console.error(ConstantesApp.errorPersonajeAleatorio, error);
+      }
     });
   }
 
   obtenerPersonajeMasLikes() {
-    this.personajeService.obtenerPersonajeConMasLikes().subscribe((personaje: any) => {
-      this.personaje = personaje.data;
+    this.cargando = true;
+    this.personajeService.obtenerPersonajeConMasLikes().subscribe({
+      next: (personaje: RespuestaGenericaDto<Personaje>) => {
+        this.personaje = personaje.data;
+        this.cargando = false;
+      },
+      error: (error) => {
+        this.cargando = false;
+        this.pintarSnackBar(ConstantesApp.errorPersonajeMasLikes);
+        console.error(ConstantesApp.errorPersonajeMasLikes, error);
+      }
     });
   }
 
   obtenerPersonajeMasDislikes() {
-    this.personajeService.obtenerPersonajeConMasDisLikes().subscribe((personaje: any) => {
-      this.personaje = personaje.data;
+    this.cargando = true;
+    this.personajeService.obtenerPersonajeConMasDisLikes().subscribe({
+      next: (personaje: RespuestaGenericaDto<Personaje>) => {
+        this.personaje = personaje.data;
+        this.cargando = false;
+      },
+      error: (error) => {
+        this.cargando = false;
+        this.pintarSnackBar(ConstantesApp.errorPersonajeMasDisLikes);
+        console.error(ConstantesApp.errorPersonajeMasDisLikes, error);
+      }
     });
   }
 
   obtenerEstadoPikachu() {
-    this.personajeService.obtenerEstadoDelPikachu().subscribe((personaje: any) => {
-      this.personaje = personaje.data;
+    this.cargando = true;
+
+    this.personajeService.obtenerEstadoDelPikachu().subscribe({
+      next: (personaje: RespuestaGenericaDto<Personaje>) => {
+        this.personaje = personaje.data;
+        this.cargando = false;
+      },
+      error: (error) => {
+        this.cargando = false;
+        this.pintarSnackBar(ConstantesApp.errorEstadoPikachu);
+        console.error(ConstantesApp.errorEstadoPikachu, error);
+      }
     });
   }
 
   onSelectChange(): void {
-    if (this.opcionSeleccionada === 'likes') {
+    if (this.opcionSeleccionada === ConstantesApp.selectLikes) {
       this.obtenerPersonajeMasLikes();
-    } else if (this.opcionSeleccionada === 'dislikes') {
+    } else if (this.opcionSeleccionada === ConstantesApp.selectDisLikes) {
       this.obtenerPersonajeMasDislikes();
-    } else if (this.opcionSeleccionada === 'pikachu') {
+    } else if (this.opcionSeleccionada === ConstantesApp.selectPikachu) {
       this.obtenerEstadoPikachu();
     }
   }
@@ -86,16 +124,18 @@ export class AppComponent {
         likes: this.personaje.likes,
         dislikes: this.personaje.dislikes
       }
-      this.personajeService.darLike(body).subscribe(() => {
-        this.snackBar.open('Like insertado exitosamente', 'Cerrar',{
-          duration:2000,
-          horizontalPosition:'center',
-          verticalPosition:'bottom',
-          panelClass: ['snack-bar-success']
-        })
-        this.opcionSeleccionada = '';
-        this.personaje = null;
-        setTimeout(() => this.cargarPersonajeAleatorio(), 500);
+      this.personajeService.darLike(body).subscribe({
+        next: () => {
+          this.pintarSnackBar(ConstantesApp.likeInsertado);
+          this.opcionSeleccionada = '';
+          this.personaje = null;
+          setTimeout(() => this.cargarPersonajeAleatorio(), 500);
+        },
+        error: (error) => {
+          this.cargando = false;
+          this.pintarSnackBar(ConstantesApp.errorAlDarLike);
+          console.error(ConstantesApp.errorAlDarLike, error);
+        }
       });
     }
   }
@@ -109,18 +149,28 @@ export class AppComponent {
         likes: this.personaje.likes,
         dislikes: this.personaje.dislikes
       }
-      this.personajeService.darDisLike(body).subscribe(() => {
-        this.snackBar.open('Dislike insertado exitosamente', 'Cerrar',{
-          duration:2000,
-          horizontalPosition:'center',
-          verticalPosition:'bottom',
-          panelClass: ['snack-bar-error']
-        })
-        this.opcionSeleccionada = '';
-        this.personaje = null;
-        setTimeout(() => this.cargarPersonajeAleatorio(), 500);
+      this.personajeService.darDisLike(body).subscribe({
+        next: () => {
+          this.pintarSnackBar(ConstantesApp.dislikeInsertado);
+          this.opcionSeleccionada = '';
+          this.personaje = null;
+          setTimeout(() => this.cargarPersonajeAleatorio(), 500);
+        },
+        error : (error) => {
+          this.cargando = false;
+        this.pintarSnackBar(ConstantesApp.errorAlDarDisLike);
+        console.error(ConstantesApp.errorAlDarDisLike, error);
+        }
       });
     }
+  }
+
+  pintarSnackBar(mensaje: string) {
+    this.snackBar.open(mensaje, 'Cerrar', {
+      duration: 2000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    })
   }
 
 }

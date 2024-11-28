@@ -16,7 +16,11 @@
     </mat-form-field>
   </div>
 
-  <div *ngIf="personaje" class="mat-card personaje-card-container">
+  <div *ngIf="cargando" class="spinner-container text-center">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <div *ngIf="personaje && !cargando" class="mat-card personaje-card-container">
     <mat-card class="personaje-card">
       <mat-card-header>
         <div class="mat-card-image-container">

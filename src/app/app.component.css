@@ -60,13 +60,3 @@ mat-icon {
   flex-direction: column;
   width: 30rem;
 }
-
-.snack-bar-success {
-  background-color: #4caf50; 
-  color: white;
-}
-
-.snack-bar-error {
-  background-color: #f44336;
-  color: white;
-}

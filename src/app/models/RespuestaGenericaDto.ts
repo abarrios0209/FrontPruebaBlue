@@ -1,7 +1,5 @@
-import { Personaje } from "./Personaje";
-
-export interface RespuestaGenericaDto {
+export interface RespuestaGenericaDto<T> {
     isSuccess: boolean;
-    data:      any;
-    message:   null;
+    data:      T;
+    message:   string;
 }
