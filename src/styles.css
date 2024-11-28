@@ -1,1 +1,19 @@
-/* You can add global styles to this file, and also import other style files */
+html, body { height: 100%; }
+body {
+  background: linear-gradient(135deg, #f0f8ff, #e6f7ff); 
+  min-height: 100vh; 
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+mat-form-field {
+  width: 50%; 
+  margin: 0 auto;
+}
